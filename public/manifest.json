@@ -1,0 +1,8 @@
+{
+  "short_name": "Navigator",
+  "name": "Phantom Navigator",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#d32f2f",
+  "background_color": "#000000"
+}
