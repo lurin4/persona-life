@@ -1,0 +1,46 @@
+/* Persona 5 Global Styles */
+:root {
+  background-color: #000;
+  color: #fff;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: "Permanent Marker", cursive;
+}
+
+h1,
+h2,
+h3,
+button {
+  font-family: "Permanent Marker", cursive;
+}
+
+/* Persona Button - High Contrast & Jagged */
+.persona-button {
+  background: #fff;
+  color: #000;
+  border: none;
+  padding: 15px;
+  clip-path: polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%);
+  transition: 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.persona-button:hover {
+  background: #d32f2f;
+  color: #fff;
+  transform: scale(1.05) rotate(-1deg);
+}
+
+/* Click Effect */
+.persona-button:active {
+  transform: scale(0.9) rotate(2deg);
+  background: #fdd835; /* Flash Gold on click */
+  box-shadow: 0px 0px 0px #000;
+}
+
+
