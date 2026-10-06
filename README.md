@@ -1,5 +1,7 @@
 # Persona Life
 
+https://personalife.netlify.app/
+
 A Persona 5-inspired productivity tracker that turns everyday self-improvement into a game.
 
 Persona Life lets you complete real-life activities to earn XP, increase your social stats, set personal goals, and track your progress through an interface inspired by *Persona 5*.
