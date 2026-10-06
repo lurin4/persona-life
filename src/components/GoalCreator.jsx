@@ -1,201 +1,179 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { AnimatePresence, motion as Motion } from "motion/react";
+import { Plus, ArrowUpRight } from "lucide-react";
+import { dateKey } from "../utils/game";
 import PersonaSelect from "./PersonaSelect";
-
 export default function GoalCreator({ addCustomGoal }) {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [stat, setStat] = useState("knowledge");
-  const [rank, setRank] = useState("1");
-
-  if (!isOpen)
-    return (
-      <div style={{ textAlign: "center", marginTop: "60px" }}>
-        <button onClick={() => setIsOpen(true)} style={addBtnStyle}>
-          + INFILTRATE NEW PALACE
-        </button>
-      </div>
-    );
-
+  const [rank, setRank] = useState("2");
+  const [type, setType] = useState("reward");
+  const [rewardXP, setRewardXP] = useState("50");
   return (
-    <div style={formWrapper}>
-      <div style={blackShadow} />
-      <div style={redAccent} />
-      <div style={whiteCardFace} />
-
-      <div style={contentLayer}>
-        <h3 style={headerStyle}>MISSION PARAMETERS</h3>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            addCustomGoal(title, date, stat, rank);
-            setIsOpen(false);
-          }}
-          style={{ overflow: "visible" }}
-        >
-          <div style={inputGroup}>
-            <label style={labelStyle}>TARGET OBJECTIVE</label>
-            <input
-              style={inputStyle}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. Midterms"
-            />
-          </div>
-          <div style={inputGroup}>
-            <label style={labelStyle}>DEADLINE</label>
-            <input
-              style={inputStyle}
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-            />
-          </div>
-          <div style={rowStyle}>
-            <div style={{ flex: 2, position: "relative" }}>
-              <label style={labelStyle}>REQUIRED STAT</label>
-              <PersonaSelect
-                value={stat}
-                options={[
-                  "knowledge",
-                  "guts",
-                  "proficiency",
-                  "kindness",
-                  "charm",
-                ]}
-                onChange={setStat}
-              />
+    <div className="creator mission-creator">
+      <button
+        className="primary-button"
+        onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+      >
+        <Plus size={18} />
+        {isOpen ? "Close mission editor" : "Add mission"}
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <Motion.form
+            className="creator-form"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (!title.trim()) {
+                event.currentTarget.elements.title.setCustomValidity(
+                  "Enter a mission title.",
+                );
+                event.currentTarget.reportValidity();
+                return;
+              }
+              if (addCustomGoal(title, date, stat, rank, type, rewardXP)) {
+                setTitle("");
+                setDate("");
+                setStat("knowledge");
+                setRank("2");
+                setType("reward");
+                setRewardXP("50");
+                setIsOpen(false);
+              }
+            }}
+          >
+            <div className="form-heading">
+              <span className="eyebrow">NEW MISSION</span>
+              <h3>Mission details</h3>
             </div>
-            <div style={{ flex: 1, position: "relative" }}>
-              <label style={labelStyle}>LVL</label>
-              <PersonaSelect
-                value={rank}
-                options={["1", "2", "3", "4", "5"]}
-                onChange={setRank}
-              />
+            <label className="settings-label" htmlFor="goal-type">
+              MISSION TYPE
+              <select
+                id="goal-type"
+                value={type}
+                onChange={(event) => setType(event.target.value)}
+              >
+                <option value="reward">
+                  Reward mission · complete to earn stat XP
+                </option>
+                <option value="rank">
+                  Stat target · clears at the required rank
+                </option>
+              </select>
+            </label>
+            <p className="form-help">
+              {type === "reward"
+                ? "Choose a stat and XP reward. Mark complete after finishing the goal to claim the reward once."
+                : "For stat progression, such as reaching Knowledge Rank 3. Clears as soon as your rank meets the target."}
+            </p>
+            <div className="form-fields">
+              <label htmlFor="goal-title">
+                MISSION TITLE
+                <input
+                  id="goal-title"
+                  name="title"
+                  required
+                  maxLength={100}
+                  value={title}
+                  placeholder={
+                    type === "reward"
+                      ? "e.g. Finish a book"
+                      : "e.g. Reach Knowledge Rank 3"
+                  }
+                  onChange={(event) => {
+                    event.target.setCustomValidity("");
+                    setTitle(event.target.value);
+                  }}
+                />
+              </label>
+              <label htmlFor="goal-date">
+                DEADLINE (OPTIONAL)
+                <input
+                  id="goal-date"
+                  type="date"
+                  min={dateKey(new Date())}
+                  value={date}
+                  onChange={(event) => setDate(event.target.value)}
+                />
+              </label>
+              {type === "reward" && (
+                <>
+                  <label htmlFor="reward-stat">
+                    REWARD STAT
+                    <PersonaSelect
+                      id="reward-stat"
+                      value={stat}
+                      options={[
+                        "knowledge",
+                        "guts",
+                        "proficiency",
+                        "kindness",
+                        "charm",
+                      ]}
+                      onChange={setStat}
+                    />
+                  </label>
+                  <label htmlFor="reward-xp">
+                    XP REWARD
+                    <PersonaSelect
+                      id="reward-xp"
+                      value={rewardXP}
+                      options={["15", "30", "50", "100"]}
+                      onChange={setRewardXP}
+                    />
+                  </label>
+                </>
+              )}
+              {type === "rank" && (
+                <>
+                  <label htmlFor="goal-stat">
+                    REQUIRED STAT
+                    <PersonaSelect
+                      id="goal-stat"
+                      value={stat}
+                      options={[
+                        "knowledge",
+                        "guts",
+                        "proficiency",
+                        "kindness",
+                        "charm",
+                      ]}
+                      onChange={setStat}
+                    />
+                  </label>
+                  <label htmlFor="goal-rank">
+                    TARGET RANK
+                    <PersonaSelect
+                      id="goal-rank"
+                      value={rank}
+                      options={["1", "2", "3", "4", "5"]}
+                      onChange={setRank}
+                    />
+                  </label>
+                </>
+              )}
             </div>
-          </div>
-          <div style={buttonArea}>
-            <button type="submit" style={submitBtn}>
-              SEND CALLING CARD
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              style={cancelBtn}
-            >
-              ABORT
-            </button>
-          </div>
-        </form>
-      </div>
+            <div className="form-actions">
+              <button type="submit" className="primary-button">
+                Add mission <ArrowUpRight size={18} />
+              </button>
+              <button
+                type="button"
+                className="text-button"
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </Motion.form>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
-
-const formWrapper = {
-  position: "relative",
-  width: "95%",
-  maxWidth: "440px",
-  margin: "140px auto 100px auto",
-  zIndex: 100,
-};
-const blackShadow = {
-  position: "absolute",
-  top: "15px",
-  left: "15px",
-  width: "100%",
-  height: "100%",
-  backgroundColor: "#000",
-  transform: "rotate(1.5deg)",
-  zIndex: 1,
-  clipPath: "polygon(0% 0%, 100% 5%, 95% 50%, 100% 95%, 0% 100%)",
-};
-const redAccent = {
-  position: "absolute",
-  top: "8px",
-  left: "8px",
-  width: "100%",
-  height: "100%",
-  backgroundColor: "#d32f2f",
-  transform: "rotate(-1deg)",
-  zIndex: 2,
-  clipPath: "polygon(0% 0%, 100% 5%, 95% 50%, 100% 95%, 0% 100%)",
-};
-const whiteCardFace = {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  backgroundColor: "#fff",
-  border: "3px solid #000",
-  transform: "rotate(-2deg)",
-  zIndex: 3,
-  clipPath: "polygon(0% 0%, 100% 5%, 95% 50%, 100% 95%, 0% 100%)",
-};
-const contentLayer = {
-  position: "relative",
-  zIndex: 4,
-  padding: "30px",
-  transform: "rotate(-1.5deg)",
-};
-const headerStyle = {
-  margin: "0 0 20px 0",
-  fontFamily: "'Permanent Marker', cursive",
-  fontSize: "1.6rem",
-  color: "#000",
-  borderBottom: "3px solid #d32f2f",
-};
-const inputGroup = { marginBottom: "18px" };
-const labelStyle = {
-  display: "block",
-  fontSize: "0.75rem",
-  fontWeight: "900",
-  color: "#d32f2f",
-  marginBottom: "5px",
-};
-const inputStyle = {
-  width: "100%",
-  padding: "12px",
-  border: "2px solid #000",
-  backgroundColor: "#f0f0f0",
-  fontWeight: "bold",
-  clipPath: "polygon(0% 0%, 100% 2%, 98% 100%, 0% 98%)",
-};
-const rowStyle = {
-  display: "flex",
-  gap: "15px",
-  marginBottom: "35px",
-  overflow: "visible",
-};
-const buttonArea = { display: "flex", gap: "10px" };
-const submitBtn = {
-  flex: 2,
-  background: "#000",
-  color: "#fff",
-  border: "none",
-  padding: "14px",
-  fontFamily: "'Permanent Marker', cursive",
-  cursor: "pointer",
-  clipPath: "polygon(5% 0%, 100% 4%, 95% 100%, 0% 96%)",
-};
-const cancelBtn = {
-  flex: 1,
-  background: "#ccc",
-  color: "#000",
-  border: "none",
-  padding: "14px",
-  fontFamily: "'Permanent Marker', cursive",
-  cursor: "pointer",
-  clipPath: "polygon(0% 4%, 95% 0%, 100% 100%, 5% 96%)",
-};
-const addBtnStyle = {
-  padding: "14px 28px",
-  background: "none",
-  color: "#d32f2f",
-  border: "3px dashed #d32f2f",
-  cursor: "pointer",
-  fontFamily: "'Permanent Marker', cursive",
-  fontSize: "1.2rem",
-};

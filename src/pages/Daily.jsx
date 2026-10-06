@@ -1,197 +1,140 @@
-import React from "react";
+import { motion as Motion, AnimatePresence } from "motion/react";
+import { ArrowUpRight, Check, RotateCcw, X, Zap } from "lucide-react";
 import ActivityCreator from "../components/ActivityCreator";
-
-const TIME_BLOCKS = [
-  "Morning",
-  "Lunch",
-  "After School",
-  "Evening",
-  "Night",
-  "Late Night",
-];
-const STAT_ICONS = {
-  knowledge: "🎓",
-  guts: "👊",
-  proficiency: "🛠️",
-  kindness: "🍀",
-  charm: "💋",
-};
-
+import { statPresentation } from "../data/presentation";
 export default function Daily({
   addXP,
-  timeIndex,
-  lastActionBlock,
+  hasUsedAction,
   activities,
   addCustomActivity,
   deleteActivity,
   resetAction,
+  stats,
+  timeLabel,
+  mode,
+  canUndo,
 }) {
-  const hasUsedAction = lastActionBlock === timeIndex;
-
   return (
-    <div style={{ ...containerWrapper, backgroundColor: "#000" }}>
-      {/* ACTIVITY GRID */}
-      <div
-        style={{
-          ...gridArea,
-          opacity: hasUsedAction ? 0.2 : 1,
-          pointerEvents: hasUsedAction ? "none" : "auto",
-        }}
-      >
-        {activities.map((act) => (
-          <div
-            key={act.id}
-            style={cardWrapper}
-            onClick={() => addXP(act.stat, act.xp)}
-          >
-            {/* RED SHADOW */}
-            <div style={pentagonShadow} />
-
-            {/* MAIN CARD FACE */}
-            <div style={pentagonFace}>
-              <span style={statLabel}>{act.stat.toUpperCase()}</span>
-              <div style={activityName}>{act.name}</div>
-
-              {/* The Icons */}
-              <div style={iconStyle}>{STAT_ICONS[act.stat]}</div>
-
-              {/* The Delete Button */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  deleteActivity(act.id);
-                }}
-                style={deleteBtn}
+    <section className="daily-page">
+      <header className="page-heading">
+        <span className="eyebrow">
+          <span className="red-dot" /> ACTIVITY LOG
+        </span>
+        <h1>
+          Daily
+          <br />
+          <span className="cutout">activities.</span>
+          <span className="heading-star" aria-hidden="true">
+            ✦
+          </span>
+        </h1>
+        <p>
+          Log an activity after completing it in real life. Each activity awards
+          XP to its associated social stat.
+        </p>
+      </header>
+      <div className={`action-status ${hasUsedAction ? "is-complete" : ""}`}>
+        <span className="status-icon">
+          {hasUsedAction ? <Check /> : <Zap />}
+        </span>
+        <div>
+          <strong>
+            {hasUsedAction
+              ? "Time block used"
+              : mode === "persona"
+                ? `${timeLabel} · one action available`
+                : "Flexible mode · log activities anytime"}
+          </strong>
+          <p>
+            {hasUsedAction
+              ? "Activity complete. Come back in the next time block."
+              : "100 XP increases a stat by one rank. Maximum rank: 5."}
+          </p>
+        </div>
+        <span className="status-stamp">
+          {hasUsedAction
+            ? "COMPLETE"
+            : mode === "persona"
+              ? "1 ACTION AVAILABLE"
+              : "NO TIME LIMIT"}
+        </span>
+      </div>
+      <div className="section-heading">
+        <h2>Choose your action</h2>
+        <span>{String(activities.length).padStart(2, "0")} ACTIVITIES</span>
+      </div>
+      <Motion.div className="activity-grid" layout>
+        <AnimatePresence>
+          {activities.map((activity, index) => {
+            const { Icon, label } = statPresentation[activity.stat];
+            return (
+              <Motion.article
+                layout
+                key={activity.id}
+                className={`activity-card ${hasUsedAction ? "is-used" : ""}`}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3, delay: index * 0.035 }}
+                whileHover={
+                  hasUsedAction ? {} : { y: -6, rotate: index % 2 ? 1 : -1 }
+                }
               >
-                ×
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* --- FOOTER / CREATOR --- */}
-      <div style={{ marginTop: "50px" }}>
-        {hasUsedAction ? (
-          <div style={exhaustedBox}>
-            <p style={exhaustedText}>GO TO SLEEP.</p>
-            <button onClick={resetAction} style={undoBtn}>
-              WAKE UP
-            </button>
-          </div>
-        ) : (
-          <ActivityCreator addCustomActivity={addCustomActivity} />
+                <button
+                  className="activity-main"
+                  disabled={hasUsedAction}
+                  onClick={() => addXP(activity.stat, activity.xp)}
+                >
+                  <div className="card-topline">
+                    <span className="eyebrow">{label}</span>
+                    <span className="xp-chip">+{activity.xp} XP</span>
+                  </div>
+                  <Icon className="activity-symbol" strokeWidth={1.5} />
+                  <span className="card-number" aria-hidden="true">
+                    0{index + 1}
+                  </span>
+                  <h3>{activity.name}</h3>
+                  <p>
+                    {activity.xp} XP toward {label}
+                  </p>
+                  <div className="card-bottom">
+                    <span>
+                      RANK {stats[activity.stat].rank}{" "}
+                      <span className="card-progress">/ 5</span>
+                    </span>
+                    <span className="card-arrow">
+                      <ArrowUpRight size={20} />
+                    </span>
+                  </div>
+                </button>
+                <button
+                  className="delete-button"
+                  aria-label={`Delete ${activity.name}`}
+                  onClick={() => deleteActivity(activity.id)}
+                >
+                  <X size={14} />
+                </button>
+              </Motion.article>
+            );
+          })}
+        </AnimatePresence>
+      </Motion.div>
+      <div className="daily-footer">
+        <ActivityCreator addCustomActivity={addCustomActivity} />
+        {canUndo && (
+          <button
+            data-sfx="custom"
+            className="text-button"
+            onClick={resetAction}
+          >
+            <RotateCcw size={15} /> Undo last activity
+          </button>
         )}
+        <p className="form-help">
+          Undo removes the XP from your last logged activity. Activity rules can
+          be changed in Settings.
+        </p>
       </div>
-    </div>
+    </section>
   );
 }
-
-// --- MASTER STYLES ---
-
-const containerWrapper = {
-  padding: "160px 20px 100px 20px",
-  minHeight: "100vh",
-  width: "100%",
-  boxSizing: "border-box",
-};
-
-const gridArea = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: "35px 15px",
-};
-
-const cardWrapper = {
-  position: "relative",
-  height: "100px",
-  cursor: "pointer",
-};
-
-const pentagonShadow = {
-  position: "absolute",
-  top: "8px",
-  left: "8px",
-  width: "100%",
-  height: "100%",
-  backgroundColor: "#d32f2f",
-  zIndex: 1,
-  clipPath: "polygon(0% 0%, 100% 0%, 92% 50%, 100% 100%, 0% 100%)",
-};
-
-const pentagonFace = {
-  position: "relative",
-  width: "100%",
-  height: "100%",
-  backgroundColor: "#fff",
-  border: "2px solid #000",
-  zIndex: 2,
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "center",
-  alignItems: "center",
-  padding: "10px",
-  clipPath: "polygon(0% 0%, 98% 2%, 92% 50%, 98% 98%, 0% 100%)",
-  boxSizing: "border-box",
-};
-
-const statLabel = {
-  fontSize: "0.6rem",
-  color: "#d32f2f",
-  fontWeight: "900",
-  letterSpacing: "1px",
-  marginBottom: "5px",
-};
-
-const activityName = {
-  fontSize: "0.9rem",
-  color: "#000",
-  textAlign: "center",
-  fontWeight: "bold",
-  lineHeight: "1",
-  fontFamily: "sans-serif",
-};
-
-const iconStyle = {
-  fontSize: "1.2rem",
-  marginTop: "5px",
-  color: "#fdd835",
-  textShadow: "1px 1px 0px #000",
-};
-
-const deleteBtn = {
-  position: "absolute",
-  top: "4px",
-  left: "4px",
-  background: "#000",
-  color: "#fdd835",
-  border: "none",
-  borderRadius: "50%",
-  width: "20px",
-  height: "20px",
-  fontSize: "14px",
-  cursor: "pointer",
-  zIndex: 10,
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  fontWeight: "bold",
-};
-
-const exhaustedBox = { textAlign: "center", marginTop: "30px" };
-const exhaustedText = {
-  fontFamily: "'Permanent Marker', cursive",
-  color: "#d32f2f",
-  fontSize: "2rem",
-};
-const undoBtn = {
-  background: "#000",
-  border: "2px solid #d32f2f",
-  color: "#d32f2f",
-  padding: "8px 15px",
-  fontSize: "0.8rem",
-  cursor: "pointer",
-  marginTop: "15px",
-  fontFamily: "'Permanent Marker', cursive",
-  clipPath: "polygon(5% 0%, 100% 0%, 95% 100%, 0% 100%)",
-};

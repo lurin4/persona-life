@@ -1,58 +1,49 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
-
+import { NavLink } from "react-router-dom";
+import { Zap, Star, Crosshair, ArrowUpRight } from "lucide-react";
+const links = [
+  { to: "/", label: "Daily life", Icon: Zap },
+  { to: "/stats", label: "Social stats", Icon: Star },
+  { to: "/goals", label: "Missions", Icon: Crosshair },
+];
 export default function NavBar() {
   return (
-    <nav style={navStyle}>
-      <NavLink to="/" label="Daily" />
-      <NavLink to="/stats" label="Stats" />
-      <NavLink to="/goals" label="Goals" />
-    </nav>
+    <aside className="sidebar">
+      <a className="brand" href="/" aria-label="Persona Life home">
+        <span className="brand-symbol">
+          P<span>★</span>
+        </span>
+        <span>
+          PERSONA<span className="brand-life">LIFE.</span>
+        </span>
+      </a>
+      <div className="sidebar-caption">ACTIVITIES / STATS / MISSIONS</div>
+      <nav aria-label="Main navigation">
+        {links.map(({ to, label, Icon: LinkIcon }, index) => (
+          <NavLink
+            aria-label={label}
+            end={to === "/"}
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `nav-link ${isActive ? "is-active" : ""}`
+            }
+          >
+            <span className="nav-index">0{index + 1}</span>
+            <LinkIcon size={20} />
+            <span>{label}</span>
+            <ArrowUpRight className="nav-arrow" size={20} />
+          </NavLink>
+        ))}
+      </nav>
+      <div className="sidebar-bottom">
+        <span className="small-star">✦</span>
+        <p>
+          100 XP per rank
+          <br />
+          <strong>5 social stats</strong>
+        </p>
+        <span className="edition">PERSONA LIFE / LOCAL SAVE</span>
+      </div>
+    </aside>
   );
 }
-
-// A small helper component to handle hover effects for each link
-function NavLink({ to, label }) {
-  const [hovered, setHovered] = useState(false);
-
-  const dynamicLinkStyle = {
-    ...linkStyle,
-    color: hovered ? "#d32f2f" : "#fff",
-    transform: hovered ? "scale(1.2) rotate(-5deg)" : "scale(1)",
-  };
-
-  return (
-    <Link
-      to={to}
-      style={dynamicLinkStyle}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      {label.toUpperCase()}
-    </Link>
-  );
-}
-
-// --- STYLES ---
-
-const navStyle = {
-  position: "fixed",
-  bottom: 0,
-  left: 0,
-  width: "100%",
-  background: "#000",
-  display: "flex",
-  justifyContent: "space-around",
-  padding: "20px 0",
-  borderTop: "5px solid #d32f2f",
-  zIndex: 1000,
-  boxShadow: "0 -5px 15px rgba(211, 47, 47, 0.3)",
-};
-
-const linkStyle = {
-  textDecoration: "none",
-  fontFamily: "'Permanent Marker', cursive",
-  fontSize: "1.5rem",
-  transition: "all 0.2s ease-in-out",
-  display: "inline-block",
-};

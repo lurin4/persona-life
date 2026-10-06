@@ -1,64 +1,45 @@
-import React, { useEffect, useState } from "react";
-
+import { useEffect } from "react";
+import { motion as Motion } from "motion/react";
+import { statPresentation } from "../data/presentation";
 export default function RankUpPopup({ statName, rank, onComplete }) {
-  const [visible, setVisible] = useState(true);
-
   useEffect(() => {
-    // Auto-hide the popup after 3 seconds
-    const timer = setTimeout(() => {
-      setVisible(false);
-      onComplete();
-    }, 3000);
+    const timer = setTimeout(onComplete, 3500);
     return () => clearTimeout(timer);
   }, [onComplete]);
-
-  if (!visible) return null;
-
   return (
-    <div style={overlayStyle}>
-      <div style={popupStyle}>
-        <h2 style={rankTextStyle}>RANK UP!</h2>
-        <div style={statNameStyle}>{statName.toUpperCase()}</div>
-        <div style={rankNumberStyle}>{rank}</div>
-      </div>
-    </div>
+    <Motion.div
+      className="rank-overlay"
+      role="status"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <Motion.div
+        className="rank-burst"
+        initial={{ scale: 0.4, rotate: -35 }}
+        animate={{ scale: 1, rotate: -8 }}
+        transition={{ type: "spring", stiffness: 240, damping: 18 }}
+        aria-hidden="true"
+      >
+        ★
+      </Motion.div>
+      <Motion.div
+        className="rank-message"
+        initial={{ scale: 0.5, y: 30 }}
+        animate={{ scale: 1, y: 0 }}
+      >
+        <span className="eyebrow">SOCIAL STAT INCREASED</span>
+        <h2>RANK UP!!</h2>
+        <p>
+          {statPresentation[statName].label} <strong>{rank}</strong>
+        </p>
+        <span className="rank-name">
+          {statPresentation[statName].ranks[rank - 1]}
+        </span>
+        <button className="outline-button" onClick={onComplete}>
+          Continue →
+        </button>
+      </Motion.div>
+    </Motion.div>
   );
 }
-
-// --- PERSONA STYLE ANIMATION CSS ---
-const overlayStyle = {
-  position: "fixed",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  backgroundColor: "rgba(0,0,0,0.8)",
-  zIndex: 1000,
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
-
-const popupStyle = {
-  background: "#d32f2f",
-  color: "#fff",
-  padding: "40px",
-  transform: "skewX(-15deg)",
-  border: "5px solid #fff",
-  textAlign: "center",
-  boxShadow: "20px 20px 0px #000",
-};
-
-const rankTextStyle = {
-  fontSize: "4rem",
-  margin: 0,
-  fontStyle: "italic",
-  fontWeight: "900",
-};
-const statNameStyle = { fontSize: "1.5rem", letterSpacing: "5px" };
-const rankNumberStyle = {
-  fontSize: "6rem",
-  fontWeight: "bold",
-  color: "#fdd835",
-  textShadow: "5px 5px 0px #000",
-};

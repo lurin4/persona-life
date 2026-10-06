@@ -1,4 +1,4 @@
-import React from "react";
+import { motion as Motion } from "motion/react";
 
 // Persona Rank Names
 const RANK_NAMES = {
@@ -35,19 +35,36 @@ export default function StatsStar({ stats }) {
   return (
     <div style={containerStyle}>
       <svg
-        width="550"
-        height="550"
-        viewBox="0 0 500 500"
+        width="100%"
+        viewBox="-80 -20 660 540"
+        role="img"
+        aria-label={statKeys
+          .map((key) => `${key}: rank ${stats[key].rank}, ${stats[key].xp} XP`)
+          .join(", ")}
         style={{ overflow: "visible" }}
       >
         {/* 1. THE BIG BLACK BACKGROUND STAR */}
         <polygon
           points="250,10 320,170 490,170 350,280 410,460 250,350 90,460 150,280 10,170 180,170"
-          fill="rgba(15, 15, 15, 0.95)"
+          fill="#252525"
           stroke="#333"
           strokeWidth="2"
         />
 
+        {[1, 2, 3, 4, 5].map((level) => (
+          <polygon
+            key={level}
+            points={statKeys
+              .map((_, index) => {
+                const point = getCoords(level, index);
+                return `${point.x},${point.y}`;
+              })
+              .join(" ")}
+            fill="none"
+            stroke="#555"
+            strokeWidth="1"
+          />
+        ))}
         {/* 2. THE RADIAL WEB LINES */}
         {statKeys.map((_, i) => {
           const end = getCoords(5, i);
@@ -65,7 +82,10 @@ export default function StatsStar({ stats }) {
         })}
 
         {/* 3. THE DATA SHAPE */}
-        <polygon
+        <Motion.polygon
+          initial={{ opacity: 0 }}
+          animate={{ points: dataPoints, opacity: 1 }}
+          transition={{ duration: 0.8 }}
           points={dataPoints}
           fill="rgba(212, 175, 55, 0.7)"
           stroke="#fdd835"
@@ -124,7 +144,8 @@ const containerStyle = {
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
-  transform: "rotate(-2deg) scale(1.05)",
+  width: "100%",
+  maxWidth: "660px",
   margin: "20px auto",
   overflow: "visible",
 };
