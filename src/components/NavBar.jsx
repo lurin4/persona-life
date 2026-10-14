@@ -1,9 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { Zap, Star, Crosshair, ArrowUpRight } from "lucide-react";
+import { Zap, Star, Crosshair, Users, ArrowUpRight } from "lucide-react";
 const links = [
   { to: "/", label: "Daily life", Icon: Zap },
   { to: "/stats", label: "Social stats", Icon: Star },
   { to: "/goals", label: "Missions", Icon: Crosshair },
+  { to: "/confidants", label: "Confidants", Icon: Users },
 ];
 export default function NavBar() {
   return (

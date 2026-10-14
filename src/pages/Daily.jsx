@@ -127,12 +127,12 @@ export default function Daily({
             className="text-button"
             onClick={resetAction}
           >
-            <RotateCcw size={15} /> Undo last activity
+            <RotateCcw size={15} /> Undo last action
           </button>
         )}
         <p className="form-help">
-          Undo removes the XP from your last logged activity. Activity rules can
-          be changed in Settings.
+          Undo removes the XP from your last activity or hangout. Activity rules
+          can be changed in Settings.
         </p>
       </div>
     </section>

@@ -115,7 +115,7 @@ export default function Settings({
             >
               <option value="free">Flexible · log activities anytime</option>
               <option value="persona">
-                Persona · one action per time block
+                Persona · one activity or hangout per block
               </option>
             </select>
           </label>

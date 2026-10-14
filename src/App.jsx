@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import { AnimatePresence, motion as Motion, MotionConfig } from "motion/react";
 
@@ -9,6 +9,14 @@ import Settings from "./components/Settings";
 import { backgroundFile } from "./utils/background";
 import Daily from "./pages/Daily";
 import Stats from "./pages/Stats";
+import Confidants from "./pages/Confidants";
+import {
+  isSocialLink,
+  logHangout,
+  undoLastAction,
+  HANGOUT_XP,
+  friendshipProgress,
+} from "./utils/socialLinks";
 import Goals from "./pages/Goals";
 import NavBar from "./components/NavBar";
 import RankUpPopup from "./components/RankUpPopup";
@@ -114,13 +122,17 @@ function App() {
     const saved = loadGame();
     return {
       ...saved,
+      socialLinks: (Array.isArray(saved.socialLinks)
+        ? saved.socialLinks
+        : []
+      ).filter(isSocialLink),
       goals: (Array.isArray(saved.goals)
         ? saved.goals
         : readSaved("p5_goals", [], Array.isArray)
       ).filter(isGoal),
     };
   });
-  const { stats, lastAction, goals } = game;
+  const { stats, lastAction, goals, socialLinks } = game;
   const setGoals = (update) =>
     setGame((previous) => ({ ...previous, goals: update(previous.goals) }));
   const [activities, setActivities] = useState(() =>
@@ -198,17 +210,50 @@ function App() {
 
   const resetAction = () => {
     if (lastAction) sound.play("undo");
-    setGame((previous) => {
-      const action = previous.lastAction;
-      if (!action) return previous;
-      return {
-        ...previous,
-        stats: { ...previous.stats, [action.stat]: action.previous },
-        lastAction: null,
-      };
-    });
+    setGame(undoLastAction);
     clearFeedback();
     clearRankUp();
+  };
+
+  const addSocialLink = (name, stat) => {
+    const friend = {
+      id: crypto.randomUUID(),
+      name: name.trim(),
+      stat,
+      hangouts: 0,
+      lastHangout: null,
+    };
+    if (!isSocialLink(friend)) return false;
+    setGame((previous) => ({
+      ...previous,
+      socialLinks: [...previous.socialLinks, friend],
+    }));
+    return true;
+  };
+
+  const deleteSocialLink = (id) =>
+    setGame((previous) => ({
+      ...previous,
+      socialLinks: previous.socialLinks.filter((friend) => friend.id !== id),
+    }));
+
+  const logSocialHangout = (id) => {
+    const next = logHangout(game, id, mode);
+    if (next === game) return;
+    const friend = socialLinks.find((link) => link.id === id);
+    const progress = next.stats[friend.stat];
+    const bond = friendshipProgress(
+      next.socialLinks.find((link) => link.id === id).hangouts,
+    );
+    const linkRankUp = bond.rank > friendshipProgress(friend.hangouts).rank;
+    sound.play(
+      linkRankUp || progress.rank > stats[friend.stat].rank ? "rank" : "xp",
+    );
+    setFeedback({ statName: friend.stat, amount: HANGOUT_XP });
+    if (linkRankUp) setRankUpData({ friendName: friend.name, rank: bond.rank });
+    else if (progress.rank > stats[friend.stat].rank)
+      setRankUpData({ statName: friend.stat, rank: progress.rank });
+    setGame((previous) => logHangout(previous, id, mode));
   };
 
   const addCustomActivity = (name, stat) => {
@@ -328,6 +373,7 @@ function App() {
           <AnimatePresence>
             {rankUpData && (
               <RankUpPopup
+                friendName={rankUpData.friendName}
                 statName={rankUpData.statName}
                 rank={rankUpData.rank}
                 onComplete={clearRankUp}
@@ -362,6 +408,25 @@ function App() {
                       />
                     }
                   />
+                  <Route
+                    path="/confidants"
+                    element={
+                      <Confidants
+                        socialLinks={socialLinks}
+                        addSocialLink={addSocialLink}
+                        deleteSocialLink={deleteSocialLink}
+                        logSocialHangout={logSocialHangout}
+                        resetAction={resetAction}
+                        lastAction={lastAction}
+                        hasUsedAction={hasUsedAction}
+                        mode={mode}
+                      />
+                    }
+                  />
+                  <Route
+                    path="/social-links"
+                    element={<Navigate to="/confidants" replace />}
+                  />
                   <Route path="/stats" element={<Stats stats={stats} />} />
                   <Route
                     path="/goals"
@@ -381,7 +446,7 @@ function App() {
             </AnimatePresence>
           </main>
           <footer className="site-footer">
-            <span>PERSONA LIFE</span>
+            <span>lurina™ 2026</span>
             <span>PROGRESS SAVED IN THIS BROWSER</span>
           </footer>
         </div>

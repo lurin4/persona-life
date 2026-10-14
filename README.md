@@ -310,3 +310,9 @@ Original synthesized cues accompany menu interactions, navigation, activity XP, 
 Run `npm run format` to format source code, styles, tests, configuration, and documentation with Prettier. Run `npm run format:check` to verify formatting without changing files. The shared configuration uses two-space indentation, double quotes, semicolons, and an 80-column target. EditorConfig applies the same indentation and line-ending conventions in compatible editors.
 
 Before submitting changes, run `npm run format:check`, `npm run lint`, `npm test`, and `npm run build`.
+
+## Confidants
+
+Open Confidants to add friends and select the stat associated with each friend. Each friend has a Confidant rank from 1 to 10. Logging a real hangout awards 25 friendship XP to that friend (100 XP per rank, four hangouts per rank), plus 15 XP to the chosen social stat. At Rank 10, friendship progress is capped but hangouts still award stat XP. Existing hangout counts automatically determine each friend’s current rank. The friend’s hangout count and last hangout date are also updated. Confidants persist with your game save.
+
+Flexible mode allows hangouts whenever they occur. Persona mode shares one time-block action between daily activities and hangouts. Undo reverses only the latest activity or hangout, including its hangout count, while preserving mission rewards. Removing a friend does not revoke XP already earned.

@@ -1,7 +1,12 @@
 import { useEffect } from "react";
 import { motion as Motion } from "motion/react";
 import { statPresentation } from "../data/presentation";
-export default function RankUpPopup({ statName, rank, onComplete }) {
+export default function RankUpPopup({
+  statName,
+  friendName,
+  rank,
+  onComplete,
+}) {
   useEffect(() => {
     const timer = setTimeout(onComplete, 3500);
     return () => clearTimeout(timer);
@@ -28,13 +33,20 @@ export default function RankUpPopup({ statName, rank, onComplete }) {
         initial={{ scale: 0.5, y: 30 }}
         animate={{ scale: 1, y: 0 }}
       >
-        <span className="eyebrow">SOCIAL STAT INCREASED</span>
+        <span className="eyebrow">
+          {friendName ? "CONFIDANT RANK INCREASED" : "SOCIAL STAT INCREASED"}
+        </span>
         <h2>RANK UP!!</h2>
         <p>
-          {statPresentation[statName].label} <strong>{rank}</strong>
+          {friendName || statPresentation[statName].label}{" "}
+          <strong>{rank}</strong>
         </p>
         <span className="rank-name">
-          {statPresentation[statName].ranks[rank - 1]}
+          {friendName
+            ? rank === 10
+              ? "MAX CONFIDANT RANK"
+              : `Confidant Rank ${rank} / 10`
+            : statPresentation[statName].ranks[rank - 1]}
         </span>
         <button className="outline-button" onClick={onComplete}>
           Continue →
