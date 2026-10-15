@@ -20,19 +20,10 @@ export default function Goals({
           <span className="cutout">missions.</span>
         </h1>
         <p>
-          Reward missions award stat XP when you mark them complete. Stat
-          targets clear immediately when you reach the required rank. You do not
-          need to wait for a deadline.
+          Complete missions to earn stat XP. Deadlines are reminders; overdue
+          missions can still be completed.
         </p>
       </header>
-      <div className="rules-panel">
-        <strong>How deadlines work</strong>
-        <p>
-          A deadline is a reminder. Overdue missions stay available and can
-          still be cleared. Reward missions grant their listed XP once. Stat
-          targets do not award XP.
-        </p>
-      </div>
       <div className="section-heading">
         <h2>Mission progress</h2>
         <span>
@@ -165,7 +156,7 @@ export default function Goals({
         <div className="empty-missions">
           <Crosshair size={54} strokeWidth={1} />
           <h2>No missions yet</h2>
-          <p>Add a reward mission or a social stat target.</p>
+          <p>Add a mission and choose its stat XP reward.</p>
         </div>
       )}
       <GoalCreator addCustomGoal={addCustomGoal} />

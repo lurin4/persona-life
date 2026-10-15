@@ -8,8 +8,6 @@ export default function GoalCreator({ addCustomGoal }) {
   const [title, setTitle] = useState("");
   const [date, setDate] = useState("");
   const [stat, setStat] = useState("knowledge");
-  const [rank, setRank] = useState("2");
-  const [type, setType] = useState("reward");
   const [rewardXP, setRewardXP] = useState("50");
   return (
     <div className="creator mission-creator">
@@ -37,12 +35,10 @@ export default function GoalCreator({ addCustomGoal }) {
                 event.currentTarget.reportValidity();
                 return;
               }
-              if (addCustomGoal(title, date, stat, rank, type, rewardXP)) {
+              if (addCustomGoal(title, date, stat, rewardXP)) {
                 setTitle("");
                 setDate("");
                 setStat("knowledge");
-                setRank("2");
-                setType("reward");
                 setRewardXP("50");
                 setIsOpen(false);
               }
@@ -52,25 +48,9 @@ export default function GoalCreator({ addCustomGoal }) {
               <span className="eyebrow">NEW MISSION</span>
               <h3>Mission details</h3>
             </div>
-            <label className="settings-label" htmlFor="goal-type">
-              MISSION TYPE
-              <select
-                id="goal-type"
-                value={type}
-                onChange={(event) => setType(event.target.value)}
-              >
-                <option value="reward">
-                  Reward mission · complete to earn stat XP
-                </option>
-                <option value="rank">
-                  Stat target · clears at the required rank
-                </option>
-              </select>
-            </label>
             <p className="form-help">
-              {type === "reward"
-                ? "Choose a stat and XP reward. Mark complete after finishing the goal to claim the reward once."
-                : "For stat progression, such as reaching Knowledge Rank 3. Clears as soon as your rank meets the target."}
+              Choose a stat and XP reward. Mark complete after finishing the
+              goal to claim the reward once.
             </p>
             <div className="form-fields">
               <label htmlFor="goal-title">
@@ -81,11 +61,7 @@ export default function GoalCreator({ addCustomGoal }) {
                   required
                   maxLength={100}
                   value={title}
-                  placeholder={
-                    type === "reward"
-                      ? "e.g. Finish a book"
-                      : "e.g. Reach Knowledge Rank 3"
-                  }
+                  placeholder="e.g. Finish a book"
                   onChange={(event) => {
                     event.target.setCustomValidity("");
                     setTitle(event.target.value);
@@ -102,62 +78,30 @@ export default function GoalCreator({ addCustomGoal }) {
                   onChange={(event) => setDate(event.target.value)}
                 />
               </label>
-              {type === "reward" && (
-                <>
-                  <label htmlFor="reward-stat">
-                    REWARD STAT
-                    <PersonaSelect
-                      id="reward-stat"
-                      value={stat}
-                      options={[
-                        "knowledge",
-                        "guts",
-                        "proficiency",
-                        "kindness",
-                        "charm",
-                      ]}
-                      onChange={setStat}
-                    />
-                  </label>
-                  <label htmlFor="reward-xp">
-                    XP REWARD
-                    <PersonaSelect
-                      id="reward-xp"
-                      value={rewardXP}
-                      options={["15", "30", "50", "100"]}
-                      onChange={setRewardXP}
-                    />
-                  </label>
-                </>
-              )}
-              {type === "rank" && (
-                <>
-                  <label htmlFor="goal-stat">
-                    REQUIRED STAT
-                    <PersonaSelect
-                      id="goal-stat"
-                      value={stat}
-                      options={[
-                        "knowledge",
-                        "guts",
-                        "proficiency",
-                        "kindness",
-                        "charm",
-                      ]}
-                      onChange={setStat}
-                    />
-                  </label>
-                  <label htmlFor="goal-rank">
-                    TARGET RANK
-                    <PersonaSelect
-                      id="goal-rank"
-                      value={rank}
-                      options={["1", "2", "3", "4", "5"]}
-                      onChange={setRank}
-                    />
-                  </label>
-                </>
-              )}
+              <label htmlFor="reward-stat">
+                REWARD STAT
+                <PersonaSelect
+                  id="reward-stat"
+                  value={stat}
+                  options={[
+                    "knowledge",
+                    "guts",
+                    "proficiency",
+                    "kindness",
+                    "charm",
+                  ]}
+                  onChange={setStat}
+                />
+              </label>
+              <label htmlFor="reward-xp">
+                XP REWARD
+                <PersonaSelect
+                  id="reward-xp"
+                  value={rewardXP}
+                  options={["15", "30", "50", "100"]}
+                  onChange={setRewardXP}
+                />
+              </label>
             </div>
             <div className="form-actions">
               <button type="submit" className="primary-button">

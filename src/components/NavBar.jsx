@@ -43,7 +43,7 @@ export default function NavBar() {
           <br />
           <strong>5 social stats</strong>
         </p>
-        <span className="edition">PERSONA LIFE / LOCAL SAVE</span>
+        <span className="edition">PERSONA LIFE</span>
       </div>
     </aside>
   );

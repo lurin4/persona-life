@@ -81,11 +81,11 @@ The chart automatically changes shape as each stat increases.
 
 ### Missions & Goals
 
-New missions have two types:
+New missions award stat XP when completed:
 
 - **Reward mission:** Choose a stat and a reward of 15, 30, 50, or 100 XP. Mark complete after finishing the goal to claim XP once. Reward missions cannot be reopened; deleting them does not revoke earned XP. Rewards do not use Persona time-block actions.
 
-- **Stat target:** Clears immediately when the selected stat reaches the target rank. Existing missions use this type. Undoing XP can make a target active again if its required rank is no longer met.
+Previously saved stat targets and tasks are preserved, but neither can be created. Existing stat targets clear immediately when the selected stat reaches the target rank; undoing XP may make them active again.
 
 Deadlines are optional reminders. You never have to wait for a deadline to clear a mission. Overdue missions stay available and can still be completed. Stat targets award no additional XP. Older saved tasks are preserved, but new tasks cannot be created. Activities and reward missions increase stats.
 

@@ -266,29 +266,17 @@ function App() {
     setActivities((prev) => prev.filter((act) => act.id !== id));
   };
 
-  const addCustomGoal = (
-    title,
-    deadline,
-    targetStat,
-    targetRank,
-    type,
-    rewardXP,
-  ) => {
+  const addCustomGoal = (title, deadline, targetStat, rewardXP) => {
     const newGoal = {
       id: crypto.randomUUID(),
       title: title.trim(),
       deadline,
       targetStat,
-      targetRank: Number(targetRank),
-      type,
+      type: "reward",
       rewardXP: Number(rewardXP),
       status: "active",
     };
-    if (
-      !["reward", "rank"].includes(type) ||
-      !isGoal(newGoal) ||
-      (deadline && daysRemaining(deadline) < 0)
-    )
+    if (!isGoal(newGoal) || (deadline && daysRemaining(deadline) < 0))
       return false;
     setGoals((prev) => [...prev, newGoal]);
     return true;
